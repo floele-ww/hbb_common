@@ -455,9 +455,9 @@ impl Config2 {
             decrypt_str_or_original(&config.unlock_pin, PASSWORD_ENC_VERSION);
         config.unlock_pin = unlock_pin;
         store |= store2;
-        if store {
-            config.store();
-        }
+        // if store {
+        //     config.store();
+        // }
         config
     }
 
