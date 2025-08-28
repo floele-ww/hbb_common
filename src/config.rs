@@ -787,24 +787,6 @@ impl Config {
     }
 
     pub fn update_latency(host: &str, latency: i64) {
-        ONLINE.lock().unwrap().insert(host.to_owned(), latency);
-        let mut host = "".to_owned();
-        let mut delay = i64::MAX;
-        for (tmp_host, tmp_delay) in ONLINE.lock().unwrap().iter() {
-            if tmp_delay > &0 && tmp_delay < &delay {
-                delay = *tmp_delay;
-                host = tmp_host.to_string();
-            }
-        }
-        if !host.is_empty() {
-            let mut config = CONFIG2.write().unwrap();
-            if host != config.rendezvous_server {
-                log::debug!("Update rendezvous_server in config to {}", host);
-                log::debug!("{:?}", *ONLINE.lock().unwrap());
-                config.rendezvous_server = host;
-                //config.store();
-            }
-        }
     }
 
     pub fn set_id(id: &str) {
