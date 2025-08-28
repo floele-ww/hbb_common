@@ -482,12 +482,6 @@ impl Config2 {
     }
 
     pub fn set(cfg: Config2) -> bool {
-        let mut lock = CONFIG2.write().unwrap();
-        if *lock == cfg {
-            return false;
-        }
-        *lock = cfg;
-        lock.store();
         true
     }
 }
