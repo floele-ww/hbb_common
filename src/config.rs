@@ -802,7 +802,7 @@ impl Config {
                 log::debug!("Update rendezvous_server in config to {}", host);
                 log::debug!("{:?}", *ONLINE.lock().unwrap());
                 config.rendezvous_server = host;
-                config.store();
+                //config.store();
             }
         }
     }
