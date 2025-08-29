@@ -1169,6 +1169,7 @@ impl Config {
     }
 
     pub fn set(cfg: Config) -> bool {
+        true
     }
 
     fn with_extension(path: PathBuf) -> PathBuf {
