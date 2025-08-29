@@ -1169,13 +1169,6 @@ impl Config {
     }
 
     pub fn set(cfg: Config) -> bool {
-        let mut lock = CONFIG.write().unwrap();
-        if *lock == cfg {
-            return false;
-        }
-        *lock = cfg;
-        lock.store();
-        true
     }
 
     fn with_extension(path: PathBuf) -> PathBuf {
