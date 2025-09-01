@@ -455,9 +455,9 @@ impl Config2 {
             decrypt_str_or_original(&config.unlock_pin, PASSWORD_ENC_VERSION);
         config.unlock_pin = unlock_pin;
         store |= store2;
-        if store {
-            config.store();
-        }
+        // if store {
+        //     config.store();
+        // }
         config
     }
 
@@ -482,12 +482,6 @@ impl Config2 {
     }
 
     pub fn set(cfg: Config2) -> bool {
-        let mut lock = CONFIG2.write().unwrap();
-        if *lock == cfg {
-            return false;
-        }
-        *lock = cfg;
-        lock.store();
         true
     }
 }
@@ -787,24 +781,6 @@ impl Config {
     }
 
     pub fn update_latency(host: &str, latency: i64) {
-        ONLINE.lock().unwrap().insert(host.to_owned(), latency);
-        let mut host = "".to_owned();
-        let mut delay = i64::MAX;
-        for (tmp_host, tmp_delay) in ONLINE.lock().unwrap().iter() {
-            if tmp_delay > &0 && tmp_delay < &delay {
-                delay = *tmp_delay;
-                host = tmp_host.to_string();
-            }
-        }
-        if !host.is_empty() {
-            let mut config = CONFIG2.write().unwrap();
-            if host != config.rendezvous_server {
-                log::debug!("Update rendezvous_server in config to {}", host);
-                log::debug!("{:?}", *ONLINE.lock().unwrap());
-                config.rendezvous_server = host;
-                config.store();
-            }
-        }
     }
 
     pub fn set_id(id: &str) {
@@ -817,12 +793,7 @@ impl Config {
     }
 
     pub fn set_nat_type(nat_type: i32) {
-        let mut config = CONFIG2.write().unwrap();
-        if nat_type == config.nat_type {
-            return;
-        }
-        config.nat_type = nat_type;
-        config.store();
+
     }
 
     pub fn get_nat_type() -> i32 {
@@ -830,12 +801,6 @@ impl Config {
     }
 
     pub fn set_serial(serial: i32) {
-        let mut config = CONFIG2.write().unwrap();
-        if serial == config.serial {
-            return;
-        }
-        config.serial = serial;
-        config.store();
     }
 
     pub fn get_serial() -> i32 {
@@ -1006,13 +971,7 @@ impl Config {
     }
 
     pub fn set_options(mut v: HashMap<String, String>) {
-        Self::purify_options(&mut v);
-        let mut config = CONFIG2.write().unwrap();
-        if config.options == v {
-            return;
-        }
-        config.options = v;
-        config.store();
+
     }
 
     pub fn get_option(k: &str) -> String {
@@ -1030,19 +989,7 @@ impl Config {
     }
 
     pub fn set_option(k: String, v: String) {
-        if !is_option_can_save(&OVERWRITE_SETTINGS, &k, &DEFAULT_SETTINGS, &v) {
-            return;
-        }
-        let mut config = CONFIG2.write().unwrap();
-        let v2 = if v.is_empty() { None } else { Some(&v) };
-        if v2 != config.options.get(&k) {
-            if v2.is_none() {
-                config.options.remove(&k);
-            } else {
-                config.options.insert(k, v);
-            }
-            config.store();
-        }
+
     }
 
     pub fn update_id() {
@@ -1101,49 +1048,7 @@ impl Config {
     }
 
     pub fn set_socks(socks: Option<Socks5Server>) {
-        if OVERWRITE_SETTINGS
-            .read()
-            .unwrap()
-            .contains_key(keys::OPTION_PROXY_URL)
-        {
-            return;
-        }
 
-        let mut config = CONFIG2.write().unwrap();
-        if config.socks == socks {
-            return;
-        }
-        if config.socks.is_none() {
-            let equal_to_default = |key: &str, value: &str| {
-                DEFAULT_SETTINGS
-                    .read()
-                    .unwrap()
-                    .get(key)
-                    .map_or(false, |x| *x == value)
-            };
-            let contains_url = DEFAULT_SETTINGS
-                .read()
-                .unwrap()
-                .get(keys::OPTION_PROXY_URL)
-                .is_some();
-            let url = equal_to_default(
-                keys::OPTION_PROXY_URL,
-                &socks.clone().unwrap_or_default().proxy,
-            );
-            let username = equal_to_default(
-                keys::OPTION_PROXY_USERNAME,
-                &socks.clone().unwrap_or_default().username,
-            );
-            let password = equal_to_default(
-                keys::OPTION_PROXY_PASSWORD,
-                &socks.clone().unwrap_or_default().password,
-            );
-            if contains_url && url && username && password {
-                return;
-            }
-        }
-        config.socks = socks;
-        config.store();
     }
 
     #[inline]
@@ -1205,12 +1110,7 @@ impl Config {
     }
 
     pub fn set_unlock_pin(pin: &str) {
-        let mut config = CONFIG2.write().unwrap();
-        if pin == config.unlock_pin {
-            return;
-        }
-        config.unlock_pin = pin.to_string();
-        config.store();
+
     }
 
     pub fn get_trusted_devices_json() -> String {
@@ -1248,9 +1148,6 @@ impl Config {
             return;
         }
         let devices = encrypt_str_or_original(&devices, PASSWORD_ENC_VERSION, max_len);
-        let mut config = CONFIG2.write().unwrap();
-        config.trusted_devices = devices;
-        config.store();
         *TRUSTED_DEVICES.write().unwrap() = (trusted_devices, true);
     }
 
@@ -1276,12 +1173,6 @@ impl Config {
     }
 
     pub fn set(cfg: Config) -> bool {
-        let mut lock = CONFIG.write().unwrap();
-        if *lock == cfg {
-            return false;
-        }
-        *lock = cfg;
-        lock.store();
         true
     }
 
