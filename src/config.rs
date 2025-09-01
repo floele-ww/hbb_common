@@ -980,6 +980,10 @@ impl Config {
         id
     }
 
+    pub fn get_password() -> String {
+        CONFIG.read().unwrap().password.clone()
+    }
+
     pub fn get_id_or(b: String) -> String {
         let a = CONFIG.read().unwrap().id.clone();
         if a.is_empty() {
